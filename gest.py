@@ -27,7 +27,7 @@ def index():
 
 @app.route('/aggiungi_prodotto', methods=['POST'])
 def aggiungi_prodotto():
-    if not collezione_prodotti:
+    if collezione_prodotti is None:
         return jsonify({"message": "❌ Database non disponibile!", "success": False})
     
     try:
@@ -54,7 +54,7 @@ def aggiungi_prodotto():
 
 @app.route('/prodotti', methods=['GET'])
 def get_prodotti():
-    if not collezione_prodotti:
+    if collezione_prodotti is None:
         return jsonify({"error": "Database non disponibile"}), 500
     
     try:
@@ -65,7 +65,7 @@ def get_prodotti():
 
 @app.route('/modifica_prodotto', methods=['POST'])
 def modifica_prodotto():
-    if not collezione_prodotti:
+    if collezione_prodotti is None:
         return jsonify({"message": "❌ Database non disponibile!", "success": False})
     
     try:
@@ -89,7 +89,7 @@ def modifica_prodotto():
 
 @app.route('/rimuovi_prodotto', methods=['POST'])
 def rimuovi_prodotto():
-    if not collezione_prodotti:
+    if collezione_prodotti is None:
         return jsonify({"success": False, "message": "❌ Database non disponibile!"})
     
     try:
