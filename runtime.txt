@@ -1,0 +1,2 @@
+# Configurazione runtime per Heroku
+python-3.11.9

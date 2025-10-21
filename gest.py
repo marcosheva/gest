@@ -5,6 +5,9 @@ import os
 
 app = Flask(__name__, template_folder='docs')
 
+# Configurazione per Heroku
+port = int(os.environ.get('PORT', 5000))
+
 # Connessione al database MongoDB
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb+srv://bet365odds:Aurora86@cluster0.svytet0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
@@ -23,7 +26,17 @@ except Exception as e:
 
 @app.route('/')
 def index():
+    print("🔍 Accesso alla homepage")
     return render_template('index.html')
+
+@app.route('/health')
+def health():
+    """Endpoint di test per verificare che l'app funzioni"""
+    return jsonify({
+        "status": "ok", 
+        "database": "connected" if collezione_prodotti is not None else "disconnected",
+        "port": port
+    })
 
 @app.route('/aggiungi_prodotto', methods=['POST'])
 def aggiungi_prodotto():
@@ -54,13 +67,18 @@ def aggiungi_prodotto():
 
 @app.route('/prodotti', methods=['GET'])
 def get_prodotti():
+    print("🔍 Richiesta prodotti ricevuta")
     if collezione_prodotti is None:
+        print("❌ Database non disponibile")
         return jsonify({"error": "Database non disponibile"}), 500
     
     try:
+        print("🔍 Recupero prodotti dal database")
         prodotti = list(collezione_prodotti.find({}, {"_id": 0}))  # Prendi tutti i prodotti senza l'ID
+        print(f"✅ Trovati {len(prodotti)} prodotti")
         return jsonify(prodotti)
     except Exception as e:
+        print(f"❌ Errore nel caricamento prodotti: {str(e)}")
         return jsonify({"error": f"Errore nel caricamento prodotti: {str(e)}"}), 500
 
 @app.route('/modifica_prodotto', methods=['POST'])
@@ -109,4 +127,5 @@ def rimuovi_prodotto():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print(f"🚀 Avvio server Flask su porta {port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
