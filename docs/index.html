@@ -34,7 +34,7 @@
             background-color: #007bff;
             border-color: #007bff;
             margin-bottom: 20px;
-
+            
         }
 
         .btn-primary:hover {
@@ -174,13 +174,18 @@
 
     async function caricaProdotti() {
         try {
+            console.log('🔍 Tentativo di caricamento prodotti...');
             const response = await fetch('/prodotti');
             
+            console.log('📡 Risposta ricevuta:', response.status, response.statusText);
+            
             if (!response.ok) {
-                throw new Error(`Errore HTTP: ${response.status}`);
+                throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
             }
             
             const prodotti = await response.json();
+            console.log('📦 Prodotti ricevuti:', prodotti);
+            
             const tableBody = document.querySelector('#prodottiTable');
             tableBody.innerHTML = '';
 
@@ -206,12 +211,28 @@
                 `;
                 tableBody.appendChild(row);
             });
+            
+            console.log('✅ Prodotti caricati con successo');
         } catch (error) {
-            console.error('Errore nel caricamento prodotti:', error);
+            console.error('❌ Errore nel caricamento prodotti:', error);
             const messageElement = document.getElementById('message');
             messageElement.textContent = `❌ Errore nel caricamento prodotti: ${error.message}`;
             messageElement.className = 'alert alert-danger';
             messageElement.style.display = 'block';
+            
+            // Prova a testare l'endpoint di health
+            testHealthEndpoint();
+        }
+    }
+    
+    async function testHealthEndpoint() {
+        try {
+            console.log('🔍 Test endpoint /health...');
+            const response = await fetch('/health');
+            const data = await response.json();
+            console.log('🏥 Health check:', data);
+        } catch (error) {
+            console.error('❌ Health check fallito:', error);
         }
     }
 
@@ -286,8 +307,11 @@
     
 
     // Carica i prodotti appena la pagina viene caricata
-    window.onload = caricaProdotti;
+    window.onload = function() {
+        console.log('🚀 Pagina caricata, avvio test...');
+        testHealthEndpoint();
+        caricaProdotti();
+    };
 </script>
 </body>
 </html>
-

@@ -29,6 +29,11 @@ def index():
     print("🔍 Accesso alla homepage")
     return render_template('index.html')
 
+@app.route('/test')
+def test():
+    """Endpoint di test semplice"""
+    return jsonify({"message": "App Flask funziona!", "timestamp": "2024-10-21"})
+
 @app.route('/health')
 def health():
     """Endpoint di test per verificare che l'app funzioni"""
