@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import json
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='docs')
 
 # Connessione al database MongoDB
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb+srv://bet365odds:Aurora86@cluster0.svytet0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
