@@ -10,75 +10,71 @@ Un'applicazione web Flask per la gestione del magazzino con database MongoDB.
 - ✅ Rimozione prodotti
 - ✅ Interfaccia responsive con Bootstrap
 
-## Deployment su Heroku
+## Deployment su Render
 
 ### Prerequisiti
-- Account Heroku
-- Git installato
-- Heroku CLI installato
+- Account Render (gratuito)
+- Repository GitHub con il codice
 
 ### Passaggi per il deployment
 
-1. **Crea un'app Heroku:**
-   ```bash
-   heroku create nome-tua-app
-   ```
-
-2. **Imposta le variabili d'ambiente (opzionale):**
-   ```bash
-   heroku config:set MONGO_URI="mongodb+srv://bet365odds:Aurora86@cluster0.svytet0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-   ```
-
-3. **Deploy del codice:**
+1. **Prepara il repository GitHub:**
    ```bash
    git add .
-   git commit -m "Deploy gestionale magazzino"
-   git push heroku main
+   git commit -m "Preparazione per Render"
+   git push origin main
    ```
 
-4. **Apri l'applicazione:**
-   ```bash
-   heroku open
-   ```
+2. **Vai su Render:**
+   - Visita [render.com](https://render.com)
+   - Fai login con GitHub
 
-### Debug su Heroku
+3. **Crea un nuovo Web Service:**
+   - Clicca "New" → "Web Service"
+   - Connetti il tuo repository GitHub
+   - Seleziona il branch `main`
 
-Se riscontri errori 404 o problemi di caricamento dati:
+4. **Configura il servizio:**
+   - **Name**: `gestionale-magazzino` (o nome a tua scelta)
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn gest:app`
+
+5. **Imposta le variabili d'ambiente:**
+   - Clicca su "Environment"
+   - Aggiungi: `MONGO_URI` = `mongodb+srv://bet365odds:Aurora86@cluster0.svytet0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+
+6. **Deploy:**
+   - Clicca "Create Web Service"
+   - Render inizierà automaticamente il build e deploy
+
+### Debug su Render
+
+Se riscontri errori:
 
 1. **Verifica i logs:**
-   ```bash
-   heroku logs --tail
-   ```
+   - Vai nella dashboard Render
+   - Clicca sulla tua app
+   - Vai su "Logs"
 
-2. **Testa l'endpoint di health:**
-   ```bash
-   curl https://nome-tua-app.herokuapp.com/health
-   ```
-
-3. **Verifica che tutti gli endpoint siano accessibili:**
+2. **Testa gli endpoint:**
    - `/` - Homepage
    - `/health` - Status dell'app
-   - `/prodotti` - Lista prodotti (GET)
-   - `/aggiungi_prodotto` - Aggiungi prodotto (POST)
-   - `/modifica_prodotto` - Modifica prodotto (POST)
-   - `/rimuovi_prodotto` - Rimuovi prodotto (POST)
+   - `/test` - Test semplice
+   - `/prodotti` - Lista prodotti
 
-4. **Controlla la configurazione:**
+3. **Controlla la configurazione:**
    - `requirements.txt` deve contenere `gunicorn==21.2.0`
-   - `Procfile` deve contenere: `web: gunicorn gest:app`
-   - `runtime.txt` specifica la versione Python
+   - `render.yaml` è presente (opzionale)
+   - Variabili d'ambiente impostate
 
-### Risoluzione problemi comuni
+### Vantaggi di Render
 
-**Errore 404 su `/prodotti`:**
-- Verifica che l'app sia deployata correttamente
-- Controlla i logs per errori di connessione MongoDB
-- Testa l'endpoint `/health` per verificare lo stato
-
-**Database non disponibile:**
-- Verifica la connessione MongoDB Atlas
-- Controlla che l'IP di Heroku sia whitelisted su MongoDB Atlas
-- Verifica le credenziali di connessione
+- ✅ **Gratuito** per progetti piccoli
+- ✅ **Deploy automatico** da GitHub
+- ✅ **HTTPS** incluso
+- ✅ **Logs** facili da vedere
+- ✅ **Variabili d'ambiente** semplici da gestire
 
 ## Struttura progetto
 
@@ -87,8 +83,7 @@ Se riscontri errori 404 o problemi di caricamento dati:
 │   └── index.html       # Template principale
 ├── gest.py              # Applicazione Flask principale
 ├── requirements.txt     # Dipendenze Python
-├── Procfile            # Configurazione Heroku
-├── runtime.txt         # Versione Python per Heroku
+├── render.yaml          # Configurazione Render (opzionale)
 └── README.md           # Questo file
 ```
 
@@ -97,4 +92,4 @@ Se riscontri errori 404 o problemi di caricamento dati:
 - **Backend:** Flask (Python)
 - **Database:** MongoDB Atlas
 - **Frontend:** HTML5, Bootstrap 5, JavaScript
-- **Deployment:** Heroku, Gunicorn
+- **Deployment:** Render, Gunicorn

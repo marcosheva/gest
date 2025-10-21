@@ -1,0 +1,8 @@
+# Configurazione per Render
+# Questo file viene usato automaticamente da Render
+
+# Comando di build (opzionale)
+# build: pip install -r requirements.txt
+
+# Comando di avvio
+start: gunicorn gest:app

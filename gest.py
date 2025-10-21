@@ -134,3 +134,6 @@ def rimuovi_prodotto():
 if __name__ == '__main__':
     print(f"🚀 Avvio server Flask su porta {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
+else:
+    # Per Render, assicurati che l'app sia configurata correttamente
+    print("🔧 Configurazione per Render")
