@@ -151,6 +151,13 @@
             messageElement.textContent = result.message;
             messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
             messageElement.style.display = 'block';
+            
+            // Se l'inserimento è andato a buon fine, azzera i campi del form
+            if (result.success) {
+                document.getElementById('nome').value = '';
+                document.getElementById('marca').value = '';
+                document.getElementById('quantita').value = '';
+            }
 
             // Carica la lista aggiornata dei prodotti
             caricaProdotti();
