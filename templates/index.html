@@ -127,93 +127,151 @@
     document.getElementById('addProductForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Preleva i dati dal form
-        const nome = document.getElementById('nome').value;
-        const marca = document.getElementById('marca').value;
-        const quantita = document.getElementById('quantita').value;
+        try {
+            // Preleva i dati dal form
+            const nome = document.getElementById('nome').value;
+            const marca = document.getElementById('marca').value;
+            const quantita = document.getElementById('quantita').value;
 
-        // Invio dati al server
-        const response = await fetch('/aggiungi_prodotto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `nome=${nome}&marca=${marca}&quantita=${quantita}`
-        });
+            // Invio dati al server
+            const response = await fetch('/aggiungi_prodotto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `nome=${nome}&marca=${marca}&quantita=${quantita}`
+            });
 
-        const result = await response.json();
+            if (!response.ok) {
+                throw new Error(`Errore HTTP: ${response.status}`);
+            }
 
-        // Mostra messaggio di successo o errore
-        const messageElement = document.getElementById('message');
-        messageElement.textContent = result.message;
-        messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
-        messageElement.style.display = 'block';
+            const result = await response.json();
 
-        // Carica la lista aggiornata dei prodotti
-        caricaProdotti();
+            // Mostra messaggio di successo o errore
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = result.message;
+            messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
+            messageElement.style.display = 'block';
+
+            // Carica la lista aggiornata dei prodotti
+            caricaProdotti();
+        } catch (error) {
+            console.error('Errore nell\'aggiunta prodotto:', error);
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = `❌ Errore nell'aggiunta prodotto: ${error.message}`;
+            messageElement.className = 'alert alert-danger';
+            messageElement.style.display = 'block';
+        }
     });
 
     async function caricaProdotti() {
-        const response = await fetch('/prodotti');
-        const prodotti = await response.json();
-        const tableBody = document.querySelector('#prodottiTable');
-        tableBody.innerHTML = '';
+        try {
+            const response = await fetch('/prodotti');
+            
+            if (!response.ok) {
+                throw new Error(`Errore HTTP: ${response.status}`);
+            }
+            
+            const prodotti = await response.json();
+            const tableBody = document.querySelector('#prodottiTable');
+            tableBody.innerHTML = '';
 
-        prodotti.forEach(prodotto => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${prodotto.nome}</td>
-                <td>${prodotto.marca}</td>
-                <td>${prodotto.quantita}</td>
-                <td class="action-icons">
-                    <i class="fas fa-edit edit" onclick="modificaProdotto('${prodotto.nome}')"></i>
-                    <i class="fas fa-trash delete" onclick="rimuoviProdotto('${prodotto.nome}')"></i>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
+            if (prodotti.error) {
+                // Mostra messaggio di errore se il database non è disponibile
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = prodotti.error;
+                messageElement.className = 'alert alert-danger';
+                messageElement.style.display = 'block';
+                return;
+            }
+
+            prodotti.forEach(prodotto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${prodotto.nome}</td>
+                    <td>${prodotto.marca}</td>
+                    <td>${prodotto.quantita}</td>
+                    <td class="action-icons">
+                        <i class="fas fa-edit edit" onclick="modificaProdotto('${prodotto.nome}')"></i>
+                        <i class="fas fa-trash delete" onclick="rimuoviProdotto('${prodotto.nome}')"></i>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Errore nel caricamento prodotti:', error);
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = `❌ Errore nel caricamento prodotti: ${error.message}`;
+            messageElement.className = 'alert alert-danger';
+            messageElement.style.display = 'block';
+        }
     }
 
     async function modificaProdotto(nomeProdotto) {
         const quantita = prompt('Nuova quantità per il prodotto ' + nomeProdotto);
 
         if (quantita !== null) {
-            const response = await fetch('/modifica_prodotto', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `nome=${nomeProdotto}&quantita=${quantita}`
-            });
+            try {
+                const response = await fetch('/modifica_prodotto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `nome=${nomeProdotto}&quantita=${quantita}`
+                });
 
-            const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
 
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = result.message;
-            messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
-            messageElement.style.display = 'block';
+                const result = await response.json();
 
-            // Ricarica i prodotti
-            caricaProdotti();
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = result.message;
+                messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
+                messageElement.style.display = 'block';
+
+                // Ricarica i prodotti
+                caricaProdotti();
+            } catch (error) {
+                console.error('Errore nella modifica prodotto:', error);
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = `❌ Errore nella modifica prodotto: ${error.message}`;
+                messageElement.className = 'alert alert-danger';
+                messageElement.style.display = 'block';
+            }
         }
     }
 
     async function rimuoviProdotto(nomeProdotto) {
         const conferma = confirm(`Sei sicuro di voler rimuovere il prodotto '${nomeProdotto}'?`);
         if (conferma) {
-            // Chiamata al backend per rimuovere il prodotto
-            const response = await fetch('/rimuovi_prodotto', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `nome=${nomeProdotto}`
-            });
-    
-            const result = await response.json();
-    
-            // Mostra messaggio di successo o errore
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = result.message;
-            messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
-            messageElement.style.display = 'block';
-    
-            // Ricarica la lista aggiornata dei prodotti
-            caricaProdotti();
+            try {
+                // Chiamata al backend per rimuovere il prodotto
+                const response = await fetch('/rimuovi_prodotto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `nome=${nomeProdotto}`
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+        
+                const result = await response.json();
+        
+                // Mostra messaggio di successo o errore
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = result.message;
+                messageElement.className = result.success ? 'alert alert-success' : 'alert alert-danger';
+                messageElement.style.display = 'block';
+        
+                // Ricarica la lista aggiornata dei prodotti
+                caricaProdotti();
+            } catch (error) {
+                console.error('Errore nella rimozione prodotto:', error);
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = `❌ Errore nella rimozione prodotto: ${error.message}`;
+                messageElement.className = 'alert alert-danger';
+                messageElement.style.display = 'block';
+            }
         }
     }
     
